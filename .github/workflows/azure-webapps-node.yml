@@ -1,0 +1,144 @@
+# This workflow will build and push a node.js application to an Azure Web App when a commit is pushed to your default branch.
+#
+# This workflow assumes you have already created the target Azure App Service web app.
+# For instructions see https://docs.microsoft.com/en-us/azure/app-service/quickstart-nodejs?tabs=linux&pivots=development-environment-cli
+#
+# To configure this workflow:
+#
+# 1. Download the Publish Profile for your Azure Web App. You can download this file from the Overview page of your Web App in the Azure Portal.
+#    For more information: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
+#
+# 2. Create a secret in your repository named AZURE_WEBAPP_PUBLISH_PROFILE, paste the publish profile contents as the value of the secret.
+#    For instructions on obtaining the publish profile see: https://docs.microsoft.com/azure/app-service/deploy-github-actions#configure-the-github-secret
+#
+# 3. Change the value for the AZURE_WEBAPP_NAME. Optionally, change the AZURE_WEBAPP_PACKAGE_PATH and NODE_VERSION environment variables below.
+#
+# For more information on GitHub Actions for Azure: https://github.com/Azure/Actions
+# For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
+
+on:
+  push:
+    branches: [ "main" ]            - 名称：设置 Node.js 环境
+  用途：actions/setup-node@v4.1.0
+  和：
+    # 在 npmrc 中设置 always-auth。
+    always-auth: # 可选，默认为 false
+    # 要使用的版本的版本规范。示例：12.x、10.15.1、>=10.15.0。
+    节点版本：#可选
+    # 包含要使用的版本的版本规范的文件。示例：package.json、.nvmrc、.node-version、.tool-versions。
+    node-version-file: # 可选
+    # Node 要使用的目标架构。示例：x86、x64。默认情况下将使用系统架构。
+    架构：#可选
+    # 如果您希望操作检查满足版本规范的最新可用版本，请设置此选项。
+    检查最新：#可选
+    # 可选注册表，用于设置身份验证。将在项目级 .npmrc 和 .yarnrc 文件中设置注册表，并设置身份验证以从 env.NODE_AUTH_TOKEN 读取。
+    registry-url: # 可选
+    # 用于针对范围注册表进行身份验证的可选范围。使用 GitHub Packages 注册表 (https://npm.pkg.github.com/) 时将返回到存储库所有者。
+    范围：#可选
+    # 用于从节点版本中提取节点分布。由于存在默认值，因此用户通常不提供该值。在 github.com 上运行此操作时，默认值就足够了。在 GHES 上运行时，如果您遇到速率限制，则可以传递 github.com 的个人访问令牌。
+    token: # 可选，默认为 ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    # 用于指定在默认目录中缓存的包管理器。支持的值：npm、yarn、pnpm。
+    缓存：#可选
+    # 用于指定依赖文件的路径：package-lock.json、yarn.lock 等。支持通配符或文件名列表，用于缓存多个依赖项。            - 名称：安装 Java JDK
+  用途：actions/setup-java@v4.5.0
+  和：
+    # 要设置的 Java 版本。采用完整或 semver Java 版本。请参阅 README 文件中支持的语法示例
+    java-version: # 可选
+    # `.java-version` 文件的路径。请参阅 README 文件中支持的语法示例
+    java-version-file: # 可选
+    # Java 发行版。请参阅 README 文件中支持的发行版列表
+    分配：
+    # 软件包类型 (jdk, jre, jdk+fx, jre+fx)
+    java-package: # 可选，默认为 jdk
+    # 包的架构（默认为动作运行器的架构）
+    架构：#可选
+    # 压缩 JDK 所在路径
+    jdkFile: # 可选
+    # 如果您希望操作检查满足版本规范的最新可用版本，请设置此选项
+    检查最新：#可选
+    # pom.xml 文件中 distributionManagement 存储库的 ID。默认为“github”
+    server-id: # 可选，默认为 github
+    # 用于向 Apache Maven 存储库进行身份验证的用户名的环境变量名称。默认值为 $GITHUB_ACTOR
+    server-username: # 可选，默认为 GITHUB_ACTOR
+    # 用于向 Apache Maven 存储库进行身份验证的密码或令牌的环境变量名称。默认值为 $GITHUB_TOKEN
+    server-password: # 可选，默认为 GITHUB_TOKEN
+    # 设置.xml 文件的写入路径。默认为 ~/.m2。
+    设置路径：#可选
+    # 如果存在 settings.xml 文件，则覆盖它。默认值为“true”。
+    覆盖设置：# 可选，默认为 true
+    # 要导入的 GPG 私钥。默认为空字符串。
+    gpg-private-key: # 可选
+    # GPG 私钥密码的环境变量名称。默认为 $GPG_PASSPHRASE。
+    gpg-passphrase: # 可选
+    # 用于缓存依赖项的构建平台的名称。它可以是“maven”、“gradle”或“sbt”。
+    缓存：#可选
+    # 依赖文件的路径：pom.xml、build.gradle、build.sbt 等。此选项可与 `cache` 选项一起使用。如果省略此选项，操作将在整个存储库中搜索依赖文件。此选项支持通配符和文件名列表，用于缓存多个依赖项。
+    缓存依赖路径：#可选
+    # 将作业状态传递到作业发布步骤的解决方法。此变量不适用于手动设置
+    job-status: # 可选，默认为 ${{ job.status }}
+    # 获取托管在 github.com 上的版本清单（例如 OpenJDK 的 Microsoft Build）时用于进行身份验证的令牌。在 github.com 上运行此操作时，默认值就足够了。在 GHES 上运行时，如果您遇到速率限制，则可以传递 github.com 的个人访问令牌。
+    token: # 可选，默认为 ${{ github.server_url == 'https://github.com' && github.token || '' }}
+    # 如果不需要默认名称“${distribution}_${java-version}”，则为 Maven 工具链 ID 的名称。请参阅高级使用文件中支持的语法示例
+    mvn-toolchain-id: # 可选
+    # 如果不需要默认名称“${distribution}”，则为 Maven 工具链供应商的名称。请参阅高级使用文件中支持的语法示例
+    mvn-toolchain-vendor: # 可选
+          
+    缓存依赖路径：#可选
+          
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '20.x'                # set this to the node version to use
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v3
+      with:
+        name: node-app
+        path: .
+
+  deploy:
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Development'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: node-app
+
+    - name: 'Deploy to Azure WebApp'
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
