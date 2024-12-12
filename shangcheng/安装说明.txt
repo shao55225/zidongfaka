@@ -1,0 +1,7 @@
+1.把源码上传到根目录，导入数据库文件“zhanmazj.sql”，或者复制整个数据库文件，到数据库目录
+
+2.修改目录/data/database.php文件，找到根据提示配置您的数据库信息！修改完毕保存上传即可！
+然后登陆后台：http://www.域名.com/admin/  账户：suibianlu  密码：suibianlu
+
+
+

@@ -1,0 +1,184 @@
+<html lang="en"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="{$asset}css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="{$asset}css/bootstrap-grid.css">
+        <link rel="stylesheet" href="{$asset}css/pc_qrcode.css">
+        <script src="{$asset}js/jquery/jquery.min.js"></script>
+        <title>{$title}</title>
+        <style>
+          body {
+                width: 100%;
+                height: 100vh;
+                background: #f7f7f7;
+             
+            }
+        </style>
+        <script type="text/javascript">
+            var mytime = 1000;
+            function myclick()
+            {
+            window.location.reload();
+            }
+            function autoclick(){
+                 setTimeout("myclick()",mytime);
+            }
+        </script>
+        <link rel="stylesheet" href="{$asset}layer/skin/default/layer.css?v=3.0.3303" id="layuicss-skinlayercss"></head>
+     <body style="background-image: url({$asset}img/login-bg-2.jpg);">
+          <section class="section details__section section--first  section--last">
+                <div style="padding-bottom: 18px;padding-top: 15px;" class="container">
+                    <div class="row ">
+                        <div class="col-12">
+                        <div style="text-align:center" class="mt-3">
+                            <svg t="1610806307396" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6171" width="26" height="26"><path d="M1024 199.18v410.38c0 110-89.54 199.18-200 199.18H200c-110.46 0-200-89.18-200-199.18V199.18C0 89.17 89.54 0 200 0h624c110.46 0 200 89.17 200 199.18z m-553.95 317v46.72q0.9 19.32 12 28.75t30.9 9.43q40.14 0 41.95-38.18v-47.58l86.6 0.45q11.73-0.9 18.49-8.76t7.67-19.54a33.48 33.48 0 0 0-7.67-19.32q-6.77-8.09-18.49-9h-86.6v-27.4l86.15-0.45q11.73-0.9 18.72-9a33.26 33.26 0 0 0 7.89-19.76q-0.9-11.23-7.67-18.42t-18.49-8.09h-66.3l69.91-113.2q9-11.68 9-24.71a50.37 50.37 0 0 0-4.28-15.27 24.48 24.48 0 0 0-7.22-9 27.29 27.29 0 0 0-9.92-4.49 74.75 74.75 0 0 0-12.4-1.8 43.43 43.43 0 0 0-19.4 7.19 54.51 54.51 0 0 0-14 13.48l-75.34 125.83L443 229.18A65.48 65.48 0 0 0 429 215a36.39 36.39 0 0 0-19.4-7.41q-18.49 2.25-25.26 10.11t-9 20.44a36.94 36.94 0 0 0 3.61 18.19 67.53 67.53 0 0 0 8.57 13.7l60.44 106H383q-12.18 0.9-18.72 8.09t-7.89 18.42q1.35 11.68 7.89 19.32t18.72 8.56l87.05 0.45v28.3H383q-12.18 0.9-18.72 8.09t-7.89 18.42a43.81 43.81 0 0 0 7.89 20.44q6.54 9.21 18.72 10.11h87.05z" fill="#4375ff" p-id="6172"></path><path d="M264.96 903.6m60.2 0l373.67 0q60.2 0 60.2 60.2l0 0q0 60.2-60.2 60.2l-373.67 0q-60.2 0-60.2-60.2l0 0q0-60.2 60.2-60.2Z" fill="#4375ff" p-id="6173"></path></svg>
+                                                           <img src="{$asset}img/{$type}.jpg" alt="" style="height:30px;">
+                                                    </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="order">
+                        <span>订单号：<span id="copy_money">{$trade_no}</span></span> 
+                    </div>
+                    <div class="goods_name">
+                        <span>商品名称：{$name}</span>              
+                    </div>
+                    <div class="price mt-2">
+                        <span>{$money}</span>
+                        <span>元</span> 
+                    </div>
+                    <div class="qr-image" id="qrcode"></div>
+                    <!--按钮-->
+                    <a id="startApp"></a>
+                    <a id="startApp1"></a>                    <div class="price mt-1">
+                        <span style="color:red"></span>  
+                         <span style="color:red">请付款{$money}元,注意不能多付或少付<br>
+                         </span>
+                         <span id="divTime" style="color:red"></span>  
+                         </div>
+                         <div class="shanxinzha">
+                              <span>请使用{$type_name}扫一扫</span>
+                               <br> <br>
+                               </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- 弹窗开始 -->
+		<script src="{$asset}layer/layer.js"></script>
+		<script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+		<audio autoplay=""><source src="{$music"></audio>
+<script type="text/javascript">
+   var intDiff = parseInt('{$outtime}');//倒计时总秒数量
+     function timer(intDiff){
+         window.setInterval(function(){
+         var day=0,
+             hour=0,
+             minute=0,
+             second=0;//时间默认值       
+         if(intDiff > 0){
+         	day = Math.floor(intDiff / (60 * 60 * 24));
+             hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+             minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+            second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+         }
+		if (minute <= 9) minute = '0' + minute;
+		if (second <= 9) second = '0' + second;
+		if (hour <= 0 && minute <= 0 && second <= 0) {
+			$("#divTime").html("<small style='color:red; font-size:26px'>订单二维码已过期</small>");
+			$("#qrcode").html('<img id="qrcode_load" src="{$asset}img/qrcode_timeout.png">');//输出过期二维码提示图片
+		}else{
+			$("#divTime").html("二维码有效时间:<small style='color:red; font-size:26px'>" + minute + "</small>分<small style='color:red; font-size:26px'>" + second + "</small>秒,失效勿付");
+		}
+		intDiff--
+		}, 1000);
+     } 
+	 
+     $(function(){
+         timer(intDiff);
+     });
+
+    $('#qrcode').qrcode({
+                text: "{$qr_url}",
+                width: 200,
+                height: 200,
+                foreground: "#000000",
+                background: "#ffffff",
+                typeNumber: -1
+            });
+            
+            function loadmsg() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "./GetPayInfo.php",
+                    data: {type: "{$type}", trade_no: "{$trade_no}"},
+                    success: function (data) {
+                        if (data.code == 1) {
+                 			layer.msg('支付成功，正在跳转中...', {icon: 16,shade: 0.1,time: 15000});
+                 			setTimeout(window.location.href=data.backurl, 1000);
+                        }else if(data.code == -2){
+                 			layer.alert('支付失败，已过期!', {icon: 'error', time: 15000});
+                 			return;
+                        }else{
+                            setTimeout("loadmsg()", 2000);
+                        }
+                    },
+                    error: function () {
+                        setTimeout("loadmsg()", 2000);
+                    }
+                });
+            }
+    
+	 function isMobilCheck() {
+    	var userAgentInfo = navigator.userAgent;
+    	var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+    	var flag = true;
+    	for (var v = 0; v < Agents.length; v++) {
+    		if (userAgentInfo.indexOf(Agents[v]) > 0) {
+    			flag = false;
+    			break;
+    		}
+    	}
+    	return flag;
+    }
+            function checkresult() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "/Pay/GetPayInfo.php",
+                    data: {type: "{$type}", trade_no: "{$trade_no}"},
+                    success: function (data) {
+                        if (data.code == 1) {
+                            layer.msg('支付成功，正在跳转中...', { icon: 16, shade: 0.1, time: 15000 });
+                            setTimeout(window.location.href = data.backurl, 1000);
+                        } else {
+                            layer.msg('您还未完成付款，请继续付款', { shade: 0, time: 1500 });
+                        }
+                    },
+                    error: function () {
+                        layer.msg('服务器错误');
+                    }
+                });
+            }
+            window.onload = function () {
+                window.onpopstate = function (e) {
+                    if (e.state == 'forward' || confirm('是否取消支付并返回？')) {
+                        window.history.back();
+                    } else {
+                        e.preventDefault();
+                        window.history.pushState('forward', null, '');
+                    }
+                };
+                window.history.pushState('forward', null, '');
+                setTimeout("loadmsg()", 3000);
+            }
+            if(!isMobilCheck()){
+            $("#startApp").html('<a type="button" href="{$qr_h5}" class="header__order mt-2 zfbbtn" style="font-size:15px" target="_blank">打开{$type_name}</a>');//H5按钮2
+            }
+	</script>
+	
+</body></html>

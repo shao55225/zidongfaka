@@ -1,0 +1,548 @@
+package com.xunpay.money.utils;
+
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
+
+import com.jfinal.plugin.activerecord.Db;
+import com.xunpay.money.model.Coke;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.NameValuePair;
+import org.apache.http.NoHttpResponseException;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+
+public class HttpCucc {
+
+    static final int timeOut = 15000;
+    private static CloseableHttpClient httpClient = null;
+    private static IdleConnectionMonitorThread idleConnectionMonitor = null;
+    private final static Object syncLock = new Object();
+
+    private static void config(HttpRequestBase httpRequestBase, String ip, Integer port) {
+        // 设置Header等
+        // httpRequestBase.setHeader("User-Agent", "Mozilla/5.0");
+        // httpRequestBase
+        // .setHeader("Accept",
+        // "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        // httpRequestBase.setHeader("Accept-Language",
+        // "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");// "en-US,en;q=0.5");
+        // httpRequestBase.setHeader("Accept-Charset",
+        // "ISO-8859-1,utf-8,gbk,gb2312;q=0.7,*;q=0.7");
+        /*ip="101.37.116.218";
+        port=25565;*/
+        HttpHost httpHost = new HttpHost(ip, port);
+        // 配置请求的超时设置
+        RequestConfig requestConfig = RequestConfig.custom().setProxy(httpHost)
+                .setConnectionRequestTimeout(timeOut).setRedirectsEnabled(false)
+                .setConnectTimeout(timeOut).setSocketTimeout(timeOut).build();
+        httpRequestBase.setConfig(requestConfig);
+    }
+
+    private static void config2(HttpRequestBase httpRequestBase, String ip, Integer port) {
+        // 设置Header等
+        // httpRequestBase.setHeader("User-Agent", "Mozilla/5.0");
+        // httpRequestBase
+        // .setHeader("Accept",
+        // "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        // httpRequestBase.setHeader("Accept-Language",
+        // "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");// "en-US,en;q=0.5");
+        // httpRequestBase.setHeader("Accept-Charset",
+        // "ISO-8859-1,utf-8,gbk,gb2312;q=0.7,*;q=0.7");
+
+        //HttpHost httpHost=new HttpHost(ip,port);
+        // 配置请求的超时设置
+        RequestConfig requestConfig = RequestConfig.custom()//.setProxy(httpHost)
+                .setConnectionRequestTimeout(timeOut)
+                .setConnectTimeout(timeOut).setSocketTimeout(timeOut).build();
+        httpRequestBase.setConfig(requestConfig);
+    }
+
+    public static CloseableHttpClient getHttpClient(String url, String ip, Integer ports) {
+        String hostname = url.split("/")[2];
+        int port = 80;
+        if (hostname.contains(":")) {
+            String[] arr = hostname.split(":");
+            hostname = arr[0];
+            port = Integer.parseInt(arr[1]);
+        }
+        System.out.println("hostname=" + hostname + "--------port=" + port);
+        if (httpClient == null) {
+            synchronized (syncLock) {
+                if (httpClient == null) {
+                    httpClient = createHttpClient(1024, 680, 800, hostname, port);
+                }
+            }
+        }
+        return httpClient;
+    }
+
+    public static CloseableHttpClient getHttpClientG(String url, String ip, Integer ports) {
+        String hostname = "123.125.96.67";
+        int port = 443;
+        if (hostname.contains(":")) {
+            String[] arr = hostname.split(":");
+            hostname = arr[0];
+            port = Integer.parseInt(arr[1]);
+        }
+        System.out.println("hostname=" + hostname + "--------port=" + port);
+        synchronized (syncLock) {
+            httpClient = createHttpClient(1024, 50, 100, hostname, port);
+        }
+        return httpClient;
+    }
+
+    public static CloseableHttpClient createHttpClient(int maxTotal, int maxPerRoute, int maxRoute, String hostname, int port) {
+
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        // 设置最大连接数
+        cm.setMaxTotal(maxTotal);
+        // 将每个路由默认最大连接数
+        cm.setDefaultMaxPerRoute(maxPerRoute);
+        HttpHost httpHost = new HttpHost(hostname, port);
+        // 设置目标主机对应的路由的最大连接数，会覆盖setDefaultMaxPerRoute设置的默认值
+        cm.setMaxPerRoute(new HttpRoute(httpHost), maxRoute);
+
+        // 请求重试处理
+        HttpRequestRetryHandler httpRequestRetryHandler = new HttpRequestRetryHandler() {
+            public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+                if (executionCount >= 3) {// 如果已经重试了3次，就放弃
+                    return false;
+                }
+                if (exception instanceof NoHttpResponseException) {// 如果服务器丢掉了连接，那么就重试
+                    return true;
+                }
+                if (exception instanceof SSLHandshakeException) {// 不要重试SSL握手异常
+                    return false;
+                }
+                if (exception instanceof InterruptedIOException) {// 超时
+                    return false;
+                }
+                if (exception instanceof UnknownHostException) {// 目标服务器不可达
+                    return false;
+                }
+                if (exception instanceof ConnectTimeoutException) {// 连接被拒绝
+                    return false;
+                }
+                if (exception instanceof SSLException) {// SSL握手异常
+                    return false;
+                }
+
+                HttpClientContext clientContext = HttpClientContext.adapt(context);
+                HttpRequest request = clientContext.getRequest();
+                // 如果请求是幂等的，就再次尝试
+                if (!(request instanceof HttpEntityEnclosingRequest)) {
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).setRetryHandler(httpRequestRetryHandler).build();
+        idleConnectionMonitor = new IdleConnectionMonitorThread(cm);
+        idleConnectionMonitor.start();
+
+        return httpClient;
+    }
+
+    private static void setPostParams(HttpPost httpost, Map<String, Object> params) {
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        Set<String> keySet = params.keySet();
+        for (String key : keySet) {
+            nvps.add(new BasicNameValuePair(key, params.get(key).toString()));
+        }
+        try {
+            httpost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String post2(String url, Map<String, Object> params, String ip, Integer port) throws IOException {
+        HttpPost httppost = new HttpPost(url);
+        config(httppost, ip, port);
+        setPostParams(httppost, params);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httppost, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);
+            return result;
+        } catch (Exception e) {
+//          e.printStackTrace();
+            throw e;
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String post(String url, Map<String, Object> params, String ip, Integer port,String userIp) throws IOException {
+        HttpPost httppost = new HttpPost(url);
+        //httppost.setHeader("Referer","https://upay.10010.com/jf_wxgz");
+        httppost.setHeader("Referer", "http://upay.10010.com/npfwap/npfMobWap/bankcharge/index.html");
+        httppost.setHeader("x-forwarded-for",userIp);
+        config(httppost, ip, port);
+        setPostParams(httppost, params);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httppost, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);
+            return result;
+        } catch (Exception e) {
+//          e.printStackTrace();
+            throw e;
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+    public static String sendPostTopUp(String url, Map<String, Object> params, String ip, Integer port, String cokie,String userIp) throws IOException {
+        HttpPost httppost = new HttpPost(url);
+        config(httppost, ip, port);
+        httppost.setHeader("Origin", "http://upay.10010.com");
+        httppost.setHeader("Referer", "http://upay.10010.com/npfwap/npfMobWap/bankcharge/index.html");
+        httppost.setHeader("x-forwarded-for", userIp);
+        httppost.setHeader("Cookie", cokie);
+        setPostParams(httppost, params);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httppost, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);
+            return result;
+        } catch (Exception e) {
+//          e.printStackTrace();
+            throw e;
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String sendPostTopUp2(String url, Map<String, Object> params, String ip, Integer port, String cokie) throws IOException {
+        HttpPost httppost = new HttpPost(url);
+        config(httppost, ip, port);
+        httppost.setHeader("Origin", "https://upay.10010.com");
+        httppost.setHeader("Referer", "https://upay.10010.com/jf_wxgz");
+        httppost.setHeader("Cookie", cokie);
+        setPostParams(httppost, params);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httppost, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);
+            return result;
+        } catch (Exception e) {
+//          e.printStackTrace();
+            throw e;
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String get(String url, String ip, Integer port) {
+        HttpGet httpget = new HttpGet(url);
+        config(httpget, ip, port);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        get("https://eomkaq.cn/notify?order_no=689511441295112248&amount=20.00&sign=595b92691daaa413e3029061979943b1",null,0);
+    }
+
+
+    public static String getCokie(String url, String ip, Integer port) {
+        HttpGet httpget = new HttpGet(url);
+        httpget.setHeader("Referer", "https://upay.10010.com/jf_wxgz");
+        config(httpget, ip, port);
+        CloseableHttpResponse response = null;
+        Header[] headers = new Header[10];
+        String result = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            if (response.getFirstHeader("Set-Cookie") == null) {
+                result = "Cookie:upay_user=a79ef7d606356617b09b688dcddd21da;";
+            } else {
+                headers = response.getHeaders("Set-Cookie");
+                for (Header header : headers) {
+                    if (header.toString().indexOf("upay_user") != -1) {
+                        result = header.toString();
+                    }
+
+                }
+            }
+
+            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static String getCokie2(String url, String ip, Integer port) {
+        HttpGet httpget = new HttpGet(url);
+        httpget.setHeader("Referer", "https://upay.10010.com/jf_wxgz2");
+        config(httpget, ip, port);
+        CloseableHttpResponse response = null;
+        String result = "";
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            if (response.getFirstHeader("Set-Cookie") == null) {
+                result = "Cookie:upay_user=a79ef7d606356617b09b688dcddd21da;";
+            } else {
+                result = response.getFirstHeader("Set-Cookie").toString();
+            }
+            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static String sendGetPayUrl(String url, String ip, Integer port) {
+        HttpGet httpget = new HttpGet(url);
+        if (ip != null && port != 0) {
+            config(httpget, ip, port);
+        }
+        //httpget.setHeader("Referer", "https://upay.10010.com/npfwap/npfMobWap/bankcharge/index.html?version=wap&desmobile=6672070486447365");
+        httpget.setHeader("Referer","https://upay.10010.com/");
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+
+            Header locationHeader  = response.getFirstHeader("Location");
+            String location = locationHeader.getValue();
+
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            return location;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
+    public static String sendPayUrl(String url, String ip, Integer port,String userIp) {
+        HttpGet httpget = new HttpGet(url);
+        if (ip != null && port != 0) {
+            config(httpget, ip, port);
+        }
+        httpget.setHeader("Referer", "https://upay.10010.com/npfwap/npfMobWap/bankcharge/index.html?version=wap&desmobile=6672070486447365");
+        httpget.setHeader("x-forwarded-for", userIp);
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            String result = EntityUtils.toString(entity, "utf-8");
+            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static String sendGetPayUrl2(String url, String ip, Integer port) {
+        HttpGet httpget = new HttpGet(url);
+        config(httpget, ip, port);
+        httpget.setHeader("Accept-Encoding", "gzip, deflate, br");
+        httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpget.setHeader("Content-type", "application/x-www-form-urlencoded");
+        httpget.setHeader("Origin", "https://upay.10010.com");
+        httpget.setHeader("Referer", "https://upay.10010.com/jf_wxgz2");
+        httpget.setHeader("User-Agent", "Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Mobile Safari/537.36");
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient(url, ip, port).execute(httpget, HttpClientContext.create());
+
+            /**修改部分**/
+//            HttpEntity entity = response.getEntity();
+//            String result = EntityUtils.toString(entity, "utf-8");
+//            EntityUtils.consume(entity);   //关闭HttpEntity是的流，如果手动关闭了InputStream instream = entity.getContent();这个流，也可以不调用这个方法
+            int code = response.getStatusLine().getStatusCode();
+            String newuri="";
+            if (code == 302) {
+                Header header = response.getFirstHeader("location"); // 跳转的目标地址是在response的 HTTP-HEAD 中的，location的值
+                newuri = header.getValue(); // 这就是跳转后的地址，再向这个地址发出新申请，以便得到跳转后的信息是啥。
+                System.out.println(newuri);
+            }
+            return newuri;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            idleConnectionMonitor.shutdown();
+            try {
+                if (response != null)
+                    response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
+    //用于监控空闲的连接池连接
+    private static final class IdleConnectionMonitorThread extends Thread {
+        private final HttpClientConnectionManager connMgr;
+        private volatile boolean shutdown;
+
+        private static final int MONITOR_INTERVAL_MS = 2000;
+        private static final int IDLE_ALIVE_MS = 5000;
+
+        public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
+            super();
+            this.connMgr = connMgr;
+            this.shutdown = false;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (!shutdown) {
+                    synchronized (this) {
+                        wait(MONITOR_INTERVAL_MS);
+                        // 关闭无效的连接
+                        connMgr.closeExpiredConnections();
+                        // 关闭空闲时间超过IDLE_ALIVE_MS的连接
+                        connMgr.closeIdleConnections(IDLE_ALIVE_MS, TimeUnit.MILLISECONDS);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 关闭后台连接
+        public void shutdown() {
+            shutdown = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+    }
+
+
+}

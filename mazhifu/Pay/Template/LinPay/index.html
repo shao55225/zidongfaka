@@ -1,0 +1,175 @@
+<html lang="zh-cn"><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>{$title}</title>
+        <link href="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="{$asset}css/mobile-style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/layer/3.1.1/theme/default/layer.css?v=3.1.1" id="layuicss-layer"></head>
+
+    <body>
+        <div class="main">
+            <div class="bg-{$type}"></div>
+            <div class="payment-logo payment-logo-wxwap">
+                <img src="{$asset}icon/{$type}-white.svg" alt="logo">
+                <span class="logo-tile">{$type_name}</span>
+            </div>
+            <div class="payment-content">
+                <h1 style="margin-top: 8px;margin-bottom: 16px;">￥{$money}</h1>
+                <h1 style="margin-top: 8px;margin-bottom: 16px;">{$name}</h1>
+                <div class="scan-the-code">
+                    <ul class="nav nav-group" role="tablist">
+                        <li class="active">
+                            <a href="JavaScript:;"><i class="icon-qrcode"></i>扫码支付</a>
+                        </li>
+                        <li>
+                            <a href="JavaScript:downloadCanvas();"><i class="icon-download"></i>保存二维码</a>
+                        </li>
+                    </ul>
+                    <div class="list-group">
+                        <div class="list-group-item text-center">
+                            <h5 class="qr-title">{$qrtitle}</h5>
+                            <div class="qr-image" id="qrcode"></div>
+                            <div class="operate">
+                                <a href="{$qr_h5}" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    <span>打开{$type_name}APP</span>
+                                </a>
+                                <a href="javascript:checkresult()" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                                    <span>检测支付状态</span>
+                                </a>
+                            </div>
+                            <p id="lxfs">联系方式:<small style="color:#F4A460; font-size:26px">{$pay_lxfs}</small></p>
+                            <p id="divTime">二维码有效时间:<small style="color:#F4A460; font-size:26px">--</small>分<small style="color:#F4A460; font-size:26px">--</small>秒,失效勿付</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/1.12.4/jquery.min.js"></script>
+        <script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/layer/3.1.1/layer.min.js"></script>
+        <script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+        <script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/clipboard.js/1.7.1/clipboard.min.js"></script>
+        <script>
+    window.onload = function(){
+             setInterval("toggleSound()",100);
+        }
+
+    function toggleSound() {
+                var music = document.getElementById("music");//获取ID  
+                    
+                if (music.paused) { //判读是否播放  
+                    music.paused=false;
+                    music.play(); //没有就播放 
+                }    
+        }
+
+$('#qrcode').qrcode({
+                text: "{$qr_url}",
+                width: 230,
+                height: 230,
+                foreground: "#000000",
+                background: "#ffffff",
+                typeNumber: -1
+            });
+            function downloadCanvas() {
+                var canvas = document.getElementsByTagName('canvas')[0];
+                var url = canvas.toDataURL('image/png');
+                var a = document.createElement('a');
+                var event = new MouseEvent('click');
+                a.download = '{$type_name}二维码.png';
+                a.href = url;
+                a.dispatchEvent(event);
+            };
+            function loadmsg() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "./GetPayInfo.php",
+                    data: {type: "{$type}", trade_no: "{$trade_no}"},
+                    success: function (data) {
+                        if (data.code == 1) {
+                 			layer.msg('支付成功，正在跳转中...', {icon: 16,shade: 0.1,time: 15000});
+                 			setTimeout(window.location.href=data.backurl, 1000);
+                        }else if(data.code == -2){
+                 			layer.alert('支付失败，已过期!', {icon: 'error', time: 15000});
+                 			return;
+                        }else{
+                            setTimeout("loadmsg()", 2000);
+                        }
+                    },
+                    error: function () {
+                        setTimeout("loadmsg()", 2000);
+                    }
+                });
+            }
+               var intDiff = parseInt({$outtime});//倒计时总秒数量
+             function timer(intDiff){
+                 window.setInterval(function(){
+                 var day=0,
+                     hour=0,
+                     minute=0,
+                     second=0;//时间默认值       
+                 if(intDiff > 0){
+                 	day = Math.floor(intDiff / (60 * 60 * 24));
+                     hour = Math.floor(intDiff / (60 * 60)) - (day * 24);
+                     minute = Math.floor(intDiff / 60) - (day * 24 * 60) - (hour * 60);
+                    second = Math.floor(intDiff) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                 }
+        		if (minute <= 9) minute = '0' + minute;
+        		if (second <= 9) second = '0' + second;
+        		if (hour <= 0 && minute <= 0 && second <= 0) {
+        			$("#divTime").html("<small style='color:red; font-size:26px'>订单二维码已过期</small>");
+        			$("#qrcode").html('<img id="qrcode_load" src="{$asset}icon/qrcode_timeout.png">');//输出过期二维码提示图片
+        		}else{
+        			$("#divTime").html("二维码有效时间:<small style='color:#F4A460; font-size:26px'>" + minute + "</small>分<small style='color:#F4A460; font-size:26px'>" + second + "</small>秒,失效勿付");
+        		}
+        		intDiff--
+        		}, 1000);
+             } 
+        	 
+             $(function(){
+                 timer(intDiff);
+             });
+            function checkresult() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "/Pay/GetPayInfo.php",
+                    data: {type: "{$type}", trade_no: "{$trade_no}"},
+                    success: function (data) {
+                        if (data.code == 1) {
+                            layer.msg('支付成功，正在跳转中...', { icon: 16, shade: 0.1, time: 15000 });
+                            setTimeout(window.location.href = data.backurl, 1000);
+                        } else {
+                            layer.msg('您还未完成付款，请继续付款', { shade: 0, time: 1500 });
+                        }
+                    },
+                    error: function () {
+                        layer.msg('服务器错误');
+                    }
+                });
+            }
+            window.onload = function () {
+                window.onpopstate = function (e) {
+                    if (e.state == 'forward' || confirm('是否取消支付并返回？')) {
+                        window.history.back();
+                    } else {
+                        e.preventDefault();
+                        window.history.pushState('forward', null, '');
+                    }
+                };
+                window.history.pushState('forward', null, '');
+                setTimeout("loadmsg()", 3000);
+            }
+        </script>
+    
+<script src="https://cdn.bootcss.com/sweetalert/2.1.0/sweetalert.min.js"></script>
+<script>{$pay_tcnr}</script>
+
+</body></html>
+<audio autoplay=""><source src="{$music}"></audio>

@@ -1,0 +1,16 @@
+[DEFAULT]
+BASEURL=http://www.suqun.net
+[InternetShortcut]
+URL=http://www.9niuym.com/
+IconIndex=14
+IconFile=C:\WINDOWS\system32\shell32.dll
+IDList=
+HotKey=0
+[DEFAULT]
+BASEURL=http://www.suqun.net
+[InternetShortcut]
+URL=http://www.suqun.net
+IconIndex=14
+IconFile=C:\WINDOWS\system32\shell32.dll
+[{000214A0-0000-0000-C000-000000000046}]
+Prop3=19,2

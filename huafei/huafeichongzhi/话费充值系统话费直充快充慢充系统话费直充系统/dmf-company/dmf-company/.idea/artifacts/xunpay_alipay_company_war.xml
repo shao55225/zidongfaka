@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="xunpay-alipay-company:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>xunpay-alipay-company</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="xunpay-alipay-company-1.0.0.war">
+      <element id="artifact" artifact-name="xunpay-alipay-company:war exploded" />
+    </root>
+  </artifact>
+</component>

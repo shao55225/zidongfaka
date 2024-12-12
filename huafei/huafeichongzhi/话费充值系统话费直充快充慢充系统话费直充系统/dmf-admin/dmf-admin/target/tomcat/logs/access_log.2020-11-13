@@ -1,0 +1,2 @@
+0:0:0:0:0:0:0:1 - - [13/Nov/2020:17:19:42 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-1 0
+0:0:0:0:0:0:0:1 - - [13/Nov/2020:17:19:42 +0800] "GET /tel_admin_war_exploded/drawNum HTTP/1.1" 404 - http-bio-8080-exec-2 0

@@ -1,0 +1,245 @@
+<!Doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0" name="viewport">
+    <title>{$title}</title>
+    <meta content="{$keywords}" name="keywords">
+    <meta content="{$description}" name="description">
+    <link rel="icon" href="favicon.ico">
+    <link href="{$asset}css/codebase.min-5.0.css" id="css-main" rel="stylesheet">
+    <link rel="stylesheet" href='https://unpkg.com/element-ui@2.15.6/packages/theme-chalk/lib/index.css' rel="external nofollow">
+</head>
+<body>
+<div class="sidebar-dark side-scroll page-header-fixed page-header-glass main-content-boxed" id="page-container">
+    <nav id="sidebar">
+        <div class="sidebar-content">
+            <div class="content-header justify-content-lg-center bg-black-10">
+                <div>
+                    <span class="smini-visible fw-bold tracking-wide fs-lg">
+                      o<span class="text-primary">t</span>
+                    </span>
+                    <a class="link-fx fw-bold tracking-wide mx-auto" href="/" target="_blank">
+                      <span class="smini-hidden">
+                        <i class="fa fa-fire text-primary"></i>
+                        <span class="fs-4 text-dual">{$sitename}</span>
+                      </span>
+                    </a>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-alt-danger d-lg-none" data-action="sidebar_close" data-toggle="layout"
+                            type="button">
+                        <i class="fa fa-fw fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <header id="page-header">
+        <div class="content-header">
+            <div class="space-x-1">
+                <a class="link-fx fw-bold" href="/" target="_blank">
+                    <i class="fa fa-rocket text-primary"></i>
+                    <span class="fs-4 text-dual">{$sitename}</span>
+                </a>
+            </div>
+        </div>
+        <div class="overlay-header bg-primary" id="page-header-loader">
+            <div class="content-header">
+                <div class="w-100 text-center">
+                    <i class="far fa-sun fa-spin text-white"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main id="main-container">
+
+        <div class="bg-body-extra-light overflow-hidden bg-image" id="#home"
+             style="background-image: url('{$tc_api}');">
+            <div class="hero">
+                <div class="hero-inner">
+                    <div class="content content-full text-center">
+                        <h1 class="display-3 fw-bold text-black mb-2">
+                            {$sitename}
+                        </h1>
+                        <h4 class="fw-medium text-black mb-2">
+                            {$description} 
+                        </h4>
+                        
+                            <a class="btn btn-lg btn-alt-info fw-semibold me-1 mb-2 fs-sm" href="/User/index.php" target="_blank">
+                            <i class="si si-login opacity-50 me-1"></i> 登 录
+                        </a>
+                            <a class="btn btn-lg btn-alt-info fw-semibold me-1 mb-2 fs-sm" href="/Test" target="_blank">
+                            <i class="si si-login opacity-50 me-1"></i> 支 付 测 试
+                        </a>
+                  </div>
+               </div>
+            </div>
+        </div>
+
+        <div class="bg-body-extra-light" id="#features">
+            <div class="content content-full pt-7">
+                <div class="py-5 text-center">
+                    <div class="position-relative">
+                        <span class="text-back">01</span>
+                        <h2 class="fw-bold mb-2 text-center">
+                            我们的 <span class="text-primary">特色</span>
+                        </h2>
+                        <h3 class="h4 fw-medium text-muted text-center mb-5">
+                            提供快速专业的服务
+                        </h3>
+                    </div>
+                    <div class="position-relative">
+                        <div class="content content-full">
+                            <div class="row g-0 justify-content-center text-center py-5">
+                                <div class="col-xl-4">
+                                    <div class="w-100 py-4">
+                                        <div class="rounded p-1 mb-4">
+                                            <div class="d-inline-block bg-corporate-lighter rounded p-4">
+                                                <i class="fa fa-cubes fa-2x text-corporate"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="h4 fw-bold mb-1">
+                                            平台公告
+                                        </h3>
+                                        <p class="fw-medium text-muted mb-0 mt-1">
+                                            禁止将本系统对接违法违规站点 请做一个遵纪守法的好公民
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4">
+                                    <div class="w-100 py-4">
+                                        <div class="rounded p-1 mb-4">
+                                            <div class="d-inline-block bg-pulse-lighter rounded p-4">
+                                                <i class="fa fa-code fa-2x text-pulse"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="h4 fw-bold mb-1">
+                                            费率超低
+                                        </h3>
+                                        <p class="fw-medium text-muted mb-0">
+                                            接口渠道直接到自己账户，省去中间商赚差价，因此我们可以给商户提供更低廉的费率。
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4">
+                                    <div class="w-100 py-4">
+                                        <div class="rounded p-1 mb-4">
+                                            <div class="d-inline-block bg-elegance-lighter rounded p-4">
+                                                <i class="fa fa-rocket fa-2x text-elegance"></i>
+                                            </div>
+                                        </div>
+                                        <h3 class="h4 fw-bold mb-1">
+                                            REST API
+                                        </h3>
+                                        <p class="fw-medium text-muted mb-0">
+                                            提供了完善的API接口，你可以用于平台应用通道接入，开发各种系统的对接通道插件等。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-body-light">
+            <div class="content content-full">
+                <div class="pt-7 pb-5">
+                    <div class="position-relative">
+                        <span class="text-back">02</span>
+                        <h2 class="fw-bold text-center mb-2">
+                            高品质 <span class="text-primary">设计</span>
+                        </h2>
+                        <h3 class="h4 fw-medium text-muted text-center mb-5">
+                            这不仅关乎数量，更重要的是质量。
+                        </h3>
+                    </div>
+                    <div class="row g-6 py-2">
+                        <div class="col-md-4 py-3">
+                            <h4 class="fw-bold mb-2">
+                                <i class="fa fa-heart text-pulse me-1"></i>
+                                接口安全
+                            </h4>
+                            <p class="fw-medium text-muted mb-0">
+                                采用国内服务器，接口稳定传输，给顾客快速流畅的体验，安全可靠的服务您的每一笔订单
+                            </p>
+                        </div>
+                        <div class="col-md-4 py-3">
+                            <h4 class="fw-bold mb-2">
+                                <i class="fa fa-compress text-corporate me-1"></i>
+                                资金保障
+                            </h4>
+                            <p class="fw-medium text-muted mb-0">
+                                商户订单信息，全部加密处理，专业技术24小时实时运维，您的帐户安全将得到充分的保障。
+                            </p>
+                        </div>
+                        <div class="col-md-4 py-3">
+                            <h4 class="fw-bold mb-2">
+                                <i class="far fa-circle text-gray me-1"></i>
+                                专属客服
+                            </h4>
+                            <p class="fw-medium text-muted mb-0">
+                                专业客服团队，专属客服一对一贴心服务，7*24小时全天候在线为你解答。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-image" id="#about" style="background-image: url('{$asset}img/photo26@2x.jpg');">
+            <div class="bg-black-75">
+                <div class="content content-top text-center">
+                    <div class="py-7">
+                        <h1 class="fw-bold text-white mb-2">运营两年</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-body-light">
+            <div class="content content-full">
+                <div class="py-5 text-center">
+                    <h3 class="fw-bold mb-2">坚持你的梦想</h3>
+                    <h4 class="fw-normal text-muted mb-4">永远相信美好的事情 即将发生</h4>
+                    <a class="btn btn-alt-primary" href="/User/Login.php" target="_blank">加入我们</a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-body-extra-light" id="page-footer">
+        <div class="content content-full">
+            <div class="row g-0 fs-sm border-top pt-3">
+                <div class="col-sm-6 order-sm-2 py-1 text-center text-sm-end">
+                    &copy; <span data-toggle="year-copy"></span> <a class="fw-semibold" href="#" target="_blank">{$sitename}</a>
+                </div>
+                <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">
+                    <img src="{$asset}img/icp.png" width="16" height="16"><a href="https://beian.miit.gov.cn/" target="_blank" class="text-muted fw-semibold">{$beian}</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<!--这个是使用自定义音乐播放的-->
+<div id="xf-MusicPlayer"  data-themeColor="xf-girlPink" data-localMusic="{$asset}playlistData.json" data-memory="1" data-cdnName="https://cdn.e7u.cc/music/xf"></div>
+
+<!--<div id="xf-MusicPlayer"  data-themeColor="xf-girlPink" data-memory="1" data-songList="9631725361" data-cdnName="https://cdn.e7u.cc/music/xf"></div>-->
+<!--这个是使用网易云音乐歌单的-->
+<script>
+window.onload = function() {
+    var info = document.getElementById("dream-info");
+    Dreamer.info("欢迎你 陌生人 愿出走半生 归来仍是少年", 8000, function () {
+    });
+};
+</script>
+ 
+ <script src="https://cdn.jsdelivr.net/gh/iGaoWei/Dream-Msg/lib/dream-msg.min.js"></script>
+<script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+<script src="{$asset}js/codebase.app.min-5.0.js"></script>
+<script src="{$asset}js/iiindex.js"></script>
+</body>
+</html>

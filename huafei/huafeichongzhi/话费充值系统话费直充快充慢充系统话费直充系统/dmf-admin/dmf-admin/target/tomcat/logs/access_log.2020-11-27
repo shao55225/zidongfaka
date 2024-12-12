@@ -1,0 +1,10 @@
+127.0.0.1 - - [27/Nov/2020:11:26:11 +0800] "GET /tel_admin_war_exploded/drawNum HTTP/1.1" 404 - http-bio-8080-exec-2 0
+127.0.0.1 - - [27/Nov/2020:11:26:11 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-1 0
+127.0.0.1 - - [27/Nov/2020:11:26:16 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-5 0
+127.0.0.1 - - [27/Nov/2020:11:26:24 +0800] "GET /tel_admin_war_exploded/drawNum HTTP/1.1" 404 - http-bio-8080-exec-6 0
+127.0.0.1 - - [27/Nov/2020:11:26:28 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-7 0
+127.0.0.1 - - [27/Nov/2020:11:26:40 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-8 0
+127.0.0.1 - - [27/Nov/2020:11:26:45 +0800] "GET /tel_admin_war_exploded/drawNum HTTP/1.1" 404 - http-bio-8080-exec-9 0
+127.0.0.1 - - [27/Nov/2020:11:26:51 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-10 0
+127.0.0.1 - - [27/Nov/2020:11:27:03 +0800] "GET /tel_admin_war_exploded/order/totalRate HTTP/1.1" 404 - http-bio-8080-exec-10 0
+127.0.0.1 - - [27/Nov/2020:11:27:05 +0800] "GET /tel_admin_war_exploded/drawNum HTTP/1.1" 404 - http-bio-8080-exec-10 0
